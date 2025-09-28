@@ -45,7 +45,7 @@ async function addFavorito(req, res) {
         if (error.code === 'ER_DUP_ENTRY') {
             return res.status(400).json({ error: 'Este producto ya está en favoritos' });
         }
-        console.error('❌ Error al agregar favorito:', error.message);
+        console.error('Error al agregar favorito:', error.message);
         res.status(500).json({ error: 'Error al agregar favorito' });
     }
 }

@@ -13,7 +13,6 @@ app.use(cors());
 app.use(express.json());
 
 // Rutas
-
 app.use('/api/productos', productosRoutes);
 app.use('/api/categorias', categoriasRoutes);
 app.use('/api/favoritos', favoritosRoutes);
