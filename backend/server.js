@@ -5,6 +5,7 @@ const pool = require('./config/db');
 const productosRoutes = require('./routes/productos');
 const categoriasRoutes = require('./routes/categorias');
 const favoritosRoutes = require('./routes/favoritos');
+const contactoRoutes = require('./routes/contacto');
 
 const app = express();
 const PORT = 4000;
@@ -16,6 +17,7 @@ app.use(express.json());
 app.use('/api/productos', productosRoutes);
 app.use('/api/categorias', categoriasRoutes);
 app.use('/api/favoritos', favoritosRoutes);
+app.use('/api/contacto', contactoRoutes);
 
 
 //Ruta de prueba para ver si funciona la API
