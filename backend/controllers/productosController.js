@@ -19,7 +19,7 @@ async function getProductos(req, res) {
         `);
         res.json(rows);
     } catch (error) {
-        console.error('❌ Error al obtener productos:', error.message);
+        console.error('Error al obtener productos:', error.message);
         res.status(500).json({ error: 'Error al obtener productos' });
     }
 }
