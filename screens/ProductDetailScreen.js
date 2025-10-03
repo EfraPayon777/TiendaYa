@@ -21,6 +21,7 @@ const ProductDetailScreen = ({ route, navigation }) => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [loading, setLoading] = useState(false);
 
+
   // Verificar si el producto está en favoritos
   const checkFavorite = async () => {
     // Solo verificar favoritos si el usuario está autenticado
@@ -223,7 +224,12 @@ const ProductDetailScreen = ({ route, navigation }) => {
                 />
               ))}
             </View>
-            <Text style={styles.ratingText}>(4.5) - 23 reseñas</Text>
+            <Text style={styles.ratingText}>
+              {product.promedio_rating && (typeof product.promedio_rating === 'number' || typeof product.promedio_rating === 'string') && parseFloat(product.promedio_rating) > 0 
+                ? `(${parseFloat(product.promedio_rating).toFixed(1)}) - ${product.total_reseñas || 0} reseñas`
+                : 'Sin reseñas'
+              }
+            </Text>
           </View>
 
           <Text style={styles.descriptionTitle}>Descripción</Text>
@@ -239,9 +245,9 @@ const ProductDetailScreen = ({ route, navigation }) => {
               <View style={styles.vendorDetails}>
                 <Text style={styles.vendorName}>{product.vendedor}</Text>
                 <Text style={styles.vendorRating}>
-                  {product.promedio_rating ? 
-                    `⭐ ${product.promedio_rating && typeof product.promedio_rating === 'number' && product.promedio_rating > 0 ? product.promedio_rating.toFixed(1) : '0.0'} (${product.total_reseñas || 0} reseñas)` : 
-                    '⭐ Sin calificar'
+                  {product.promedio_rating && (typeof product.promedio_rating === 'number' || typeof product.promedio_rating === 'string') && parseFloat(product.promedio_rating) > 0
+                    ? `⭐ ${parseFloat(product.promedio_rating).toFixed(1)} (${product.total_reseñas || 0} reseñas)` 
+                    : '⭐ Sin calificar'
                   }
                 </Text>
               </View>

@@ -137,8 +137,8 @@ const FavScreen = ({ navigation }) => {
         <View style={styles.ratingContainer}>
           <Ionicons name="star" size={16} color="#FFD700" />
           <Text style={styles.ratingText}>
-            {item.promedio_rating && typeof item.promedio_rating === 'number' && item.promedio_rating > 0 ? 
-              `(${item.promedio_rating.toFixed(1)})` : 
+            {item.promedio_rating && (typeof item.promedio_rating === 'number' || typeof item.promedio_rating === 'string') && parseFloat(item.promedio_rating) > 0 ? 
+              `(${parseFloat(item.promedio_rating).toFixed(1)})` : 
               '(Sin calificar)'
             }
           </Text>

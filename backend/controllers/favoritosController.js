@@ -60,11 +60,15 @@ async function getFavoritosByUser(req, res) {
                 FROM producto_img 
                 WHERE producto_id = p.id 
                 ORDER BY principal DESC, orden ASC 
-                LIMIT 1) AS imagen
+                LIMIT 1) AS imagen,
+                COALESCE(ROUND(AVG(pr.rating), 1), 0) AS promedio_rating,
+                COALESCE(COUNT(pr.id), 0) AS total_reseñas
             FROM favoritos f
             INNER JOIN productos p ON f.producto_id = p.id
             LEFT JOIN usuarios u ON p.vendedorId = u.id
+            LEFT JOIN producto_ratings pr ON p.id = pr.producto_id
             WHERE f.user_id = ?
+            GROUP BY f.producto_id, p.nombre, p.descripcion, p.precio, p.stock, u.nombre, u.telefono, f.guardadoEn
             ORDER BY f.guardadoEn DESC
         `, [userId]);
 
