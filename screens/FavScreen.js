@@ -90,13 +90,16 @@ const FavScreen = ({ navigation }) => {
   }, []);
 
   const renderProductCard = ({ item }) => (
-    <View style={[
-      styles.productCard,
-      isWeb && {
-        width: isDesktop ? '22%' : isTablet ? '30%' : '45%',
-        margin: isWeb ? '1%' : 8,
-      }
-    ]}>
+    <TouchableOpacity 
+      style={[
+        styles.productCard,
+        isWeb && {
+          width: isDesktop ? '22%' : isTablet ? '30%' : '45%',
+          margin: isWeb ? '1%' : 8,
+        }
+      ]}
+      onPress={() => navigation.navigate('ProductDetail', { product: item })}
+    >
       {/* Imagen del producto */}
       <View style={styles.imageContainer}>
         <Image 
@@ -109,7 +112,10 @@ const FavScreen = ({ navigation }) => {
         {/* Botón de favorito */}
         <TouchableOpacity
           style={styles.favoriteButton}
-          onPress={() => removeFromFavorites(item.id)}>
+          onPress={(e) => {
+            e.stopPropagation(); // Evitar que se active el onPress del card
+            removeFromFavorites(item.id);
+          }}>
           <Ionicons
             name="heart"
             size={24}
@@ -130,13 +136,18 @@ const FavScreen = ({ navigation }) => {
         {/* Rating con estrellas */}
         <View style={styles.ratingContainer}>
           <Ionicons name="star" size={16} color="#FFD700" />
-          <Text style={styles.ratingText}>({item.rating || 'N/A'})</Text>
+          <Text style={styles.ratingText}>
+            {item.promedio_rating && typeof item.promedio_rating === 'number' && item.promedio_rating > 0 ? 
+              `(${item.promedio_rating.toFixed(1)})` : 
+              '(Sin calificar)'
+            }
+          </Text>
         </View>
 
         {/* Precio */}
         <Text style={styles.productPrice}>${item.precio}</Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 
   const renderEmptyState = () => (

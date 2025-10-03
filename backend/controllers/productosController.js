@@ -9,6 +9,7 @@ async function getProductos(req, res) {
                 p.descripcion, 
                 p.precio, 
                 p.stock, 
+                p.categoria_id,
                 c.nombre AS categoria, 
                 u.nombre AS vendedor, 
                 u.telefono,
@@ -20,7 +21,7 @@ async function getProductos(req, res) {
             LEFT JOIN usuarios u ON p.vendedorId = u.id
             LEFT JOIN producto_img pi ON p.id = pi.producto_id AND pi.principal = 1
             LEFT JOIN producto_ratings pr ON p.id = pr.producto_id
-            GROUP BY p.id, c.nombre, u.nombre, u.telefono, pi.img_url
+            GROUP BY p.id, p.categoria_id, c.nombre, u.nombre, u.telefono, pi.img_url
             ORDER BY p.creadoEn DESC
         `);
         res.json(rows);
@@ -40,6 +41,7 @@ async function getProductoById(req, res) {
                 p.descripcion, 
                 p.precio, 
                 p.stock, 
+                p.categoria_id,
                 c.nombre AS categoria, 
                 u.nombre AS vendedor, 
                 u.telefono,
@@ -50,7 +52,7 @@ async function getProductoById(req, res) {
             LEFT JOIN usuarios u ON p.vendedorId = u.id
             LEFT JOIN producto_ratings pr ON p.id = pr.producto_id
             WHERE p.id = ?
-            GROUP BY p.id, c.nombre, u.nombre, u.telefono
+            GROUP BY p.id, p.categoria_id, c.nombre, u.nombre, u.telefono
         `, [id]);
 
         if (producto.length === 0) {

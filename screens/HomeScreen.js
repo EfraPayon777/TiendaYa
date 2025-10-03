@@ -53,11 +53,15 @@ const HomeScreen = ({ navigation }) => {
   // Obtener categorías
   const fetchCategorias = async () => {
     try {
+      console.log('🔍 Cargando categorías...');
       const response = await fetch('http://192.168.3.21:4000/api/categorias');
       const data = await response.json();
       
+      console.log('🔍 Categorías recibidas:', data);
+      
       if (response.ok) {
         setCategorias(data);
+        console.log('✅ Categorías cargadas:', data.length);
       }
     } catch (error) {
       console.error('Error fetching categories:', error);
@@ -78,6 +82,8 @@ const HomeScreen = ({ navigation }) => {
   };
 
   const handleCategoryFilter = (categoriaId) => {
+    console.log('🔍 Filtrando por categoría:', categoriaId);
+    console.log('🔍 Categoría seleccionada anterior:', selectedCategory);
     setSelectedCategory(selectedCategory === categoriaId ? null : categoriaId);
   };
 
@@ -130,6 +136,12 @@ const HomeScreen = ({ navigation }) => {
     const matchesSearch = product.nombre.toLowerCase().includes(searchText.toLowerCase()) ||
                          product.descripcion.toLowerCase().includes(searchText.toLowerCase());
     const matchesCategory = !selectedCategory || product.categoria_id === selectedCategory;
+    
+    console.log('🔍 Filtro - Producto:', product.nombre);
+    console.log('🔍 Filtro - Categoría del producto:', product.categoria_id, 'Tipo:', typeof product.categoria_id);
+    console.log('🔍 Filtro - Categoría seleccionada:', selectedCategory, 'Tipo:', typeof selectedCategory);
+    console.log('🔍 Filtro - Coincide categoría:', matchesCategory);
+    
     return matchesSearch && matchesCategory;
   });
 
