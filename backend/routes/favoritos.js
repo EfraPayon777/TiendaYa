@@ -7,7 +7,7 @@ const {
 
 const router = express.Router();
 
-// Listar favoritos de un usuario
+// Listar favoritos de un usuario específico
 router.get('/:userId', getFavoritosByUser);
 
 // Agregar producto a favoritos

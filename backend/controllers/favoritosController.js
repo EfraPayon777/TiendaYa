@@ -1,12 +1,55 @@
 const pool = require('../config/db');
 
+// GET /api/favoritos - Obtener todos los favoritos (para pruebas)
+async function getAllFavoritos(req, res) {
+    try {
+        console.log('🔍 Intentando obtener todos los favoritos...');
+        
+        // Primero verificar si hay favoritos en la tabla
+        const [countResult] = await pool.query('SELECT COUNT(*) as total FROM favoritos');
+        console.log('📊 Total de favoritos en la base de datos:', countResult[0].total);
+        
+        if (countResult[0].total === 0) {
+            console.log('⚠️ No hay favoritos en la base de datos');
+            return res.json([]);
+        }
+        
+        const [rows] = await pool.query(`
+            SELECT 
+                f.producto_id as id,
+                p.nombre,
+                p.descripcion,
+                p.precio,
+                p.stock,
+                u.nombre AS vendedor,
+                u.telefono,
+                pi.img_url AS imagen
+            FROM favoritos f
+            INNER JOIN productos p ON f.producto_id = p.id
+            LEFT JOIN usuarios u ON p.vendedorId = u.id
+            LEFT JOIN producto_img pi ON p.id = pi.producto_id AND pi.principal = 1
+            ORDER BY f.guardadoEn DESC
+        `);
+
+        console.log('✅ Favoritos obtenidos:', rows.length);
+        res.json(rows);
+    } catch (error) {
+        console.error('❌ Error al obtener favoritos:', error.message);
+        res.status(500).json({ 
+            success: false,
+            error: 'Error al obtener favoritos',
+            details: error.message 
+        });
+    }
+}
+
 // GET /api/favoritos/:userId
 async function getFavoritosByUser(req, res) {
     const { userId } = req.params;
     try {
         const [rows] = await pool.query(`
             SELECT 
-                f.producto_id,
+                f.producto_id as id,
                 p.nombre,
                 p.descripcion,
                 p.precio,
@@ -69,4 +112,4 @@ async function removeFavorito(req, res) {
     }
 }
 
-module.exports = { getFavoritosByUser, addFavorito, removeFavorito };
+module.exports = { getAllFavoritos, getFavoritosByUser, addFavorito, removeFavorito };
