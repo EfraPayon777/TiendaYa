@@ -23,6 +23,12 @@ const ProductDetailScreen = ({ route, navigation }) => {
 
   // Verificar si el producto está en favoritos
   const checkFavorite = async () => {
+    // Solo verificar favoritos si el usuario está autenticado
+    if (!user || !user.id) {
+      console.log('Usuario no autenticado, saltando verificación de favoritos');
+      return;
+    }
+    
     try {
       const response = await fetch(`http://192.168.3.21:4000/api/favoritos/${user.id}`);
       const favorites = await response.json();
@@ -39,6 +45,19 @@ const ProductDetailScreen = ({ route, navigation }) => {
   }, []);
 
   const toggleFavorite = async () => {
+    // Verificar si el usuario está autenticado
+    if (!user || !user.id) {
+      Alert.alert(
+        'Iniciar Sesión',
+        'Debes iniciar sesión para agregar productos a favoritos',
+        [
+          { text: 'Cancelar', style: 'cancel' },
+          { text: 'Iniciar Sesión', onPress: () => navigation.navigate('Login') }
+        ]
+      );
+      return;
+    }
+
     try {
       setLoading(true);
       
@@ -95,8 +114,21 @@ const ProductDetailScreen = ({ route, navigation }) => {
   };
 
   const handleLeaveReview = () => {
+    // Verificar si el usuario está autenticado
+    if (!user || !user.id) {
+      Alert.alert(
+        'Iniciar Sesión',
+        'Debes iniciar sesión para dejar una reseña',
+        [
+          { text: 'Cancelar', style: 'cancel' },
+          { text: 'Iniciar Sesión', onPress: () => navigation.navigate('Login') }
+        ]
+      );
+      return;
+    }
+
     // Verificar si el usuario es el vendedor del producto
-    if (user && user.id === product.vendedorId) {
+    if (user.id === product.vendedorId) {
       Alert.alert('No permitido', 'No puedes calificar tu propio producto');
       return;
     }
