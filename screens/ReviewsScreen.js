@@ -118,16 +118,6 @@ const ReviewsScreen = ({ navigation }) => {
     return (
       <SafeAreaView style={styles.container}>
         <StatusBar barStyle="dark-content" />
-        <View style={styles.header}>
-          <TouchableOpacity 
-            style={styles.backButton}
-            onPress={() => navigation.goBack()}
-          >
-            <Ionicons name="arrow-back" size={24} color="#1A1A1A" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Mis Reseñas</Text>
-          <View style={styles.placeholder} />
-        </View>
         <View style={styles.loadingContainer}>
           <Text style={styles.loadingText}>Cargando reseñas...</Text>
         </View>
@@ -140,16 +130,6 @@ const ReviewsScreen = ({ navigation }) => {
       <StatusBar barStyle="dark-content" />
       
       {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity 
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <Ionicons name="arrow-back" size={24} color="#1A1A1A" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Mis Reseñas</Text>
-        <View style={styles.placeholder} />
-      </View>
 
       {/* Lista de reseñas */}
       <FlatList
@@ -171,27 +151,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F8F9FA',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    backgroundColor: '#FFFFFF',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E5E5',
-  },
-  backButton: {
-    padding: 8,
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#1A1A1A',
-  },
-  placeholder: {
-    width: 40,
   },
   loadingContainer: {
     flex: 1,

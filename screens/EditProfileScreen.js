@@ -142,15 +142,16 @@ const EditProfileScreen = ({ navigation }) => {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.container}
       >
-        {/* Header */}
-        <View style={styles.header}>
+
+        {/* Botón de retroceso */}
+        <View style={styles.topBar}>
           <TouchableOpacity 
             style={styles.backButton}
             onPress={() => navigation.goBack()}
           >
             <Ionicons name="arrow-back" size={24} color="#1A1A1A" />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Editar Perfil</Text>
+          <Text style={styles.screenTitle}>Editar Perfil</Text>
           <View style={styles.placeholder} />
         </View>
 
@@ -249,7 +250,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F8F9FA',
   },
-  header: {
+  topBar: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -262,7 +263,7 @@ const styles = StyleSheet.create({
   backButton: {
     padding: 8,
   },
-  headerTitle: {
+  screenTitle: {
     fontSize: 18,
     fontWeight: '600',
     color: '#1A1A1A',

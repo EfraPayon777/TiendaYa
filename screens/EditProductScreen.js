@@ -181,13 +181,7 @@ const EditProductScreen = ({ route, navigation }) => {
       >
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity 
-            style={styles.backButton}
-            onPress={() => navigation.goBack()}
-          >
-            <Ionicons name="arrow-back" size={24} color="#1A1A1A" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Editar Producto</Text>
+          <View style={styles.placeholder} />
           <TouchableOpacity 
             style={styles.deleteButton}
             onPress={handleDelete}
@@ -357,20 +351,15 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
     paddingHorizontal: 20,
     paddingVertical: 16,
     backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
     borderBottomColor: '#E5E5E5',
   },
-  backButton: {
-    padding: 8,
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#1A1A1A',
+  placeholder: {
+    flex: 1,
   },
   deleteButton: {
     padding: 8,

@@ -237,8 +237,10 @@ const HomeScreen = ({ navigation }) => {
       
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>TiendaYa</Text>
-        <Text style={styles.headerSubtitle}>Encuentra lo que necesitas</Text>
+        <View style={styles.headerText}>
+          <Text style={styles.headerTitle}>TiendaYa</Text>
+          <Text style={styles.headerSubtitle}>Encuentra lo que necesitas</Text>
+        </View>
         
         {/* Botones de navegación */}
         <View style={styles.navButtons}>
@@ -378,6 +380,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 4,
+  },
+  headerText: {
+    flex: 1,
   },
   headerTitle: {
     fontSize: 28,

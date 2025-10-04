@@ -79,22 +79,34 @@ const ProfileScreen = ({ navigation }) => {
 
   const fetchUserStats = async () => {
     try {
+      console.log('📊 Obteniendo estadísticas del usuario...');
+      
       // Obtener productos del usuario
-      const productos = await apiRequest(API_ENDPOINTS.PRODUCTOS);
+      const productos = await apiRequest(API_ENDPOINTS.USUARIO_PRODUCTOS(user.id));
+      console.log('📦 Productos del usuario:', productos.length);
       
       // Obtener favoritos del usuario
-      const favoritos = await apiRequest(API_ENDPOINTS.FAVORITOS_BY_USER(userData.id));
+      const favoritos = await apiRequest(API_ENDPOINTS.FAVORITOS_BY_USER(user.id));
+      console.log('❤️ Favoritos del usuario:', favoritos.length);
       
-      // Obtener reseñas del usuario (simulado por ahora)
-      const reseñas = 23; // En producción vendría de la API de ratings
+      // Obtener reseñas del usuario
+      const reseñas = await apiRequest(API_ENDPOINTS.REVIEWS_BY_USER(user.id));
+      console.log('⭐ Reseñas del usuario:', reseñas.length);
       
       setStats({
         productos: productos.length,
         favoritos: favoritos.length,
-        reseñas: reseñas,
+        reseñas: reseñas.length,
       });
+      
+      console.log('✅ Estadísticas actualizadas:', {
+        productos: productos.length,
+        favoritos: favoritos.length,
+        reseñas: reseñas.length,
+      });
+      
     } catch (error) {
-      console.error('Error fetching stats:', error);
+      console.error('❌ Error fetching stats:', error);
       // Usar datos por defecto si hay error
       setStats({
         productos: 0,
@@ -128,28 +140,6 @@ const ProfileScreen = ({ navigation }) => {
     }
   };
 
-  const takePhoto = async () => {
-    try {
-      const { status } = await ImagePicker.requestCameraPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert('Permisos', 'Se necesitan permisos para acceder a la cámara');
-        return;
-      }
-
-      const result = await ImagePicker.launchCameraAsync({
-        allowsEditing: true,
-        aspect: [1, 1],
-        quality: 0.8,
-      });
-
-      if (!result.canceled && result.assets[0]) {
-        await updateProfilePhoto(result.assets[0].uri);
-      }
-    } catch (error) {
-      console.error('Error al tomar foto:', error);
-      Alert.alert('Error', 'No se pudo tomar la foto');
-    }
-  };
 
   const updateProfilePhoto = async (imageUri) => {
     try {
@@ -301,6 +291,7 @@ const ProfileScreen = ({ navigation }) => {
         style={{ flex: 1 }}
         contentContainerStyle={{ 
           flexGrow: 1,
+          paddingTop: 20, // Espacio superior
           paddingBottom: 50 // Espacio extra al final
         }}
       >
@@ -314,22 +305,6 @@ const ProfileScreen = ({ navigation }) => {
               }}
               style={styles.avatar}
             />
-            <TouchableOpacity 
-              style={styles.editAvatarButton}
-              onPress={() => {
-                Alert.alert(
-                  'Cambiar foto de perfil',
-                  '¿Cómo quieres cambiar tu foto?',
-                  [
-                    { text: 'Galería', onPress: selectImage },
-                    { text: 'Cámara', onPress: takePhoto },
-                    { text: 'Cancelar', style: 'cancel' }
-                  ]
-                );
-              }}
-            >
-              <Ionicons name="camera" size={16} color="#FFFFFF" />
-            </TouchableOpacity>
           </View>
           
           <Text style={styles.userName}>{userData.nombre}</Text>
@@ -484,19 +459,6 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     borderWidth: 4,
     borderColor: '#F3F4F6',
-  },
-  editAvatarButton: {
-    position: 'absolute',
-    bottom: 0,
-    right: 0,
-    backgroundColor: '#FC930A',
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 3,
-    borderColor: '#FFFFFF',
   },
   userName: {
     fontSize: 24,

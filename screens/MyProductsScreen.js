@@ -118,16 +118,6 @@ const MyProductsScreen = ({ navigation }) => {
     return (
       <SafeAreaView style={styles.container}>
         <StatusBar barStyle="dark-content" />
-        <View style={styles.header}>
-          <TouchableOpacity 
-            style={styles.backButton}
-            onPress={() => navigation.goBack()}
-          >
-            <Ionicons name="arrow-back" size={24} color="#1A1A1A" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Mis Productos</Text>
-          <View style={styles.placeholder} />
-        </View>
         <View style={styles.loadingContainer}>
           <Text style={styles.loadingText}>Cargando productos...</Text>
         </View>
@@ -141,13 +131,6 @@ const MyProductsScreen = ({ navigation }) => {
       
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity 
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <Ionicons name="arrow-back" size={24} color="#1A1A1A" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Mis Productos</Text>
         <TouchableOpacity
           style={styles.addButton}
           onPress={() => navigation.navigate('PostProduct')}
@@ -181,23 +164,12 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
     paddingHorizontal: 20,
     paddingVertical: 16,
     backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
     borderBottomColor: '#E5E5E5',
-  },
-  backButton: {
-    padding: 8,
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#1A1A1A',
-  },
-  placeholder: {
-    width: 40,
   },
   addButton: {
     padding: 8,
