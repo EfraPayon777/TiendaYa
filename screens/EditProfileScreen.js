@@ -15,6 +15,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../contexts/AuthContext';
 import { useResponsive } from '../hooks/useResponsive';
+import { API_ENDPOINTS, apiRequest } from '../utils/api';
 
 const EditProfileScreen = ({ navigation }) => {
   const { user, updateUser } = useAuth();
@@ -45,31 +46,24 @@ const EditProfileScreen = ({ navigation }) => {
 
     setLoading(true);
     try {
-      const response = await fetch(`http://192.168.3.21:4000/api/usuarios/${user.id}`, {
+      await apiRequest(API_ENDPOINTS.USUARIO_BY_ID(user.id), {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({
           nombre: formData.nombre,
           telefono: formData.telefono,
         }),
       });
 
-      if (response.ok) {
-        // Actualizar el contexto con los nuevos datos
-        updateUser({
-          ...user,
-          nombre: formData.nombre,
-          telefono: formData.telefono,
-        });
-        
-        Alert.alert('Éxito', 'Perfil actualizado correctamente', [
-          { text: 'OK', onPress: () => navigation.goBack() }
-        ]);
-      } else {
-        Alert.alert('Error', 'No se pudo actualizar el perfil');
-      }
+      // Actualizar el contexto con los nuevos datos
+      updateUser({
+        ...user,
+        nombre: formData.nombre,
+        telefono: formData.telefono,
+      });
+      
+      Alert.alert('Éxito', 'Perfil actualizado correctamente', [
+        { text: 'OK', onPress: () => navigation.goBack() }
+      ]);
     } catch (error) {
       console.error('Error updating profile:', error);
       Alert.alert('Error', 'Error de conexión con el servidor');

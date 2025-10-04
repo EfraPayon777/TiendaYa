@@ -15,6 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useAuth } from '../contexts/AuthContext';
 import { useResponsive } from '../hooks/useResponsive';
+import { API_ENDPOINTS, apiRequest } from '../utils/api';
 
 const LoginScreen = ({ navigation }) => {
   const { login } = useAuth();
@@ -34,28 +35,19 @@ const LoginScreen = ({ navigation }) => {
 
     setLoading(true);
     try {
-      const response = await fetch('http://192.168.3.21:4000/api/auth/login', {
+      const result = await apiRequest(API_ENDPOINTS.LOGIN, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify(formData),
       });
 
-      const result = await response.json();
-
-      if (response.ok) {
-        // Guardar datos de autenticación en el contexto
-        await login(result.data.user, result.data.token);
-        Alert.alert('¡Bienvenido!', 'Inicio de sesión exitoso', [
-          { text: 'OK', onPress: () => navigation.navigate('Home') }
-        ]);
-      } else {
-        Alert.alert('Error', result.message || 'Credenciales incorrectas');
-      }
+      // Guardar datos de autenticación en el contexto
+      await login(result.data.user, result.data.token);
+      Alert.alert('¡Bienvenido!', 'Inicio de sesión exitoso', [
+        { text: 'OK', onPress: () => navigation.navigate('Home') }
+      ]);
     } catch (error) {
       console.error('Login error:', error);
-      Alert.alert('Error', 'Error de conexión con el servidor');
+      Alert.alert('Error', error.message || 'Credenciales incorrectas');
     } finally {
       setLoading(false);
     }

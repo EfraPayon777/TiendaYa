@@ -14,6 +14,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../contexts/AuthContext';
 import { useResponsive } from '../hooks/useResponsive';
 import StarRating from '../components/StarRating';
+import { API_ENDPOINTS, apiRequest } from '../utils/api';
 
 const AddReviewScreen = ({ route, navigation }) => {
   const { product } = route.params;
@@ -30,11 +31,8 @@ const AddReviewScreen = ({ route, navigation }) => {
 
     setLoading(true);
     try {
-      const response = await fetch('http://192.168.3.21:4000/api/reviews', {
+      await apiRequest(API_ENDPOINTS.REVIEWS, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({
           userId: user.id,
           productoId: product.id,
@@ -42,14 +40,9 @@ const AddReviewScreen = ({ route, navigation }) => {
         }),
       });
 
-      if (response.ok) {
-        Alert.alert('Éxito', 'Reseña enviada correctamente', [
-          { text: 'OK', onPress: () => navigation.goBack() }
-        ]);
-      } else {
-        const error = await response.json();
-        Alert.alert('Error', error.error || 'No se pudo enviar la reseña');
-      }
+      Alert.alert('Éxito', 'Reseña enviada correctamente', [
+        { text: 'OK', onPress: () => navigation.goBack() }
+      ]);
     } catch (error) {
       console.error('Error submitting review:', error);
       Alert.alert('Error', 'Error de conexión con el servidor');

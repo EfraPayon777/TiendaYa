@@ -18,6 +18,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useAuth } from '../contexts/AuthContext';
 import { useResponsive } from '../hooks/useResponsive';
+import { API_ENDPOINTS, apiRequest } from '../utils/api';
 
 const PostProductScreen = ({ navigation }) => {
   const { user, token, isAuthenticated } = useAuth();
@@ -38,14 +39,8 @@ const PostProductScreen = ({ navigation }) => {
   // Obtener categorías desde la API
   const fetchCategorias = async () => {
     try {
-      const response = await fetch('http://192.168.3.21:4000/api/categorias');
-      const data = await response.json();
-      
-      if (response.ok) {
-        setCategorias(data);
-      } else {
-        Alert.alert('Error', 'No se pudieron cargar las categorías');
-      }
+      const data = await apiRequest(API_ENDPOINTS.CATEGORIAS);
+      setCategorias(data);
     } catch (error) {
       console.error('Error fetching categories:', error);
       Alert.alert('Error', 'Error de conexión con el servidor');
@@ -121,32 +116,22 @@ const PostProductScreen = ({ navigation }) => {
       console.log('Datos a enviar:', dataToSend);
 
       console.log('Enviando datos al servidor...');
-      const response = await fetch('http://192.168.3.21:4000/api/productos', {
+      const result = await apiRequest(API_ENDPOINTS.PRODUCTOS, {
         method: 'POST',
         body: JSON.stringify(dataToSend),
-        headers: {
-          'Content-Type': 'application/json',
-        },
       });
 
-      console.log('Respuesta del servidor:', response.status);
-      const result = await response.json();
       console.log('Resultado:', result);
 
-      if (response.ok) {
-        console.log('Producto publicado exitosamente');
-        console.log('Reseteando formulario...');
-        resetForm();
-        console.log('Navegando a Home...');
-        navigation.navigate('Home');
-        console.log('Navegación completada');
-        
-        // Mostrar mensaje de éxito
-        Alert.alert('¡Éxito!', 'Producto publicado correctamente');
-      } else {
-        console.log('Error al publicar producto:', result.message);
-        Alert.alert('Error', result.message || 'No se pudo publicar el producto');
-      }
+      console.log('Producto publicado exitosamente');
+      console.log('Reseteando formulario...');
+      resetForm();
+      console.log('Navegando a Home...');
+      navigation.navigate('Home');
+      console.log('Navegación completada');
+      
+      // Mostrar mensaje de éxito
+      Alert.alert('¡Éxito!', 'Producto publicado correctamente');
     } catch (error) {
       console.error('Error posting product:', error);
       Alert.alert('Error', 'Error de conexión con el servidor');

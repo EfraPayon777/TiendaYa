@@ -13,6 +13,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../contexts/AuthContext';
 import { useResponsive } from '../hooks/useResponsive';
+import { API_ENDPOINTS, apiRequest } from '../utils/api';
 
 const ProfileScreen = ({ navigation }) => {
   const { user, logout } = useAuth();
@@ -61,12 +62,10 @@ const ProfileScreen = ({ navigation }) => {
   const fetchUserStats = async () => {
     try {
       // Obtener productos del usuario
-      const productosResponse = await fetch('http://192.168.3.21:4000/api/productos');
-      const productos = await productosResponse.json();
+      const productos = await apiRequest(API_ENDPOINTS.PRODUCTOS);
       
       // Obtener favoritos del usuario
-      const favoritosResponse = await fetch(`http://192.168.3.21:4000/api/favoritos/${userData.id}`);
-      const favoritos = await favoritosResponse.json();
+      const favoritos = await apiRequest(API_ENDPOINTS.FAVORITOS_BY_USER(userData.id));
       
       // Obtener reseñas del usuario (simulado por ahora)
       const reseñas = 23; // En producción vendría de la API de ratings

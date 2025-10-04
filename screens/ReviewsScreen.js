@@ -14,6 +14,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../contexts/AuthContext';
 import { useResponsive } from '../hooks/useResponsive';
 import StarRating from '../components/StarRating';
+import { API_ENDPOINTS, apiRequest } from '../utils/api';
 
 const ReviewsScreen = ({ navigation }) => {
   const { user } = useAuth();
@@ -26,14 +27,8 @@ const ReviewsScreen = ({ navigation }) => {
   const fetchMyReviews = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`http://192.168.3.21:4000/api/reviews/usuario/${user.id}`);
-      const data = await response.json();
-      
-      if (response.ok) {
-        setReviews(data);
-      } else {
-        Alert.alert('Error', 'No se pudieron cargar tus reseñas');
-      }
+      const data = await apiRequest(API_ENDPOINTS.REVIEWS_BY_USER(user.id));
+      setReviews(data);
     } catch (error) {
       console.error('Error fetching reviews:', error);
       Alert.alert('Error', 'Error de conexión con el servidor');
@@ -93,17 +88,12 @@ const ReviewsScreen = ({ navigation }) => {
           style: 'destructive',
           onPress: async () => {
             try {
-              const response = await fetch(
-                `http://192.168.3.21:4000/api/reviews/${user.id}/${productoId}`,
-                { method: 'DELETE' }
-              );
+              await apiRequest(API_ENDPOINTS.REVIEW_BY_USER_PRODUCT(user.id, productoId), {
+                method: 'DELETE'
+              });
               
-              if (response.ok) {
-                Alert.alert('Éxito', 'Reseña eliminada correctamente');
-                fetchMyReviews(); // Recargar la lista
-              } else {
-                Alert.alert('Error', 'No se pudo eliminar la reseña');
-              }
+              Alert.alert('Éxito', 'Reseña eliminada correctamente');
+              fetchMyReviews(); // Recargar la lista
             } catch (error) {
               console.error('Error deleting review:', error);
               Alert.alert('Error', 'Error de conexión con el servidor');

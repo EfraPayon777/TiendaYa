@@ -14,6 +14,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useAuth } from '../contexts/AuthContext';
+import { API_ENDPOINTS, apiRequest } from '../utils/api';
 
 const ProductDetailScreen = ({ route, navigation }) => {
   const { product } = route.params;
@@ -31,9 +32,8 @@ const ProductDetailScreen = ({ route, navigation }) => {
     }
     
     try {
-      const response = await fetch(`http://192.168.3.21:4000/api/favoritos/${user.id}`);
-      const favorites = await response.json();
-      if (response.ok && favorites.some(fav => fav.id === product.id)) {
+      const favorites = await apiRequest(API_ENDPOINTS.FAVORITOS_BY_USER(user.id));
+      if (favorites.some(fav => fav.id === product.id)) {
         setIsFavorite(true);
       }
     } catch (error) {
@@ -64,32 +64,22 @@ const ProductDetailScreen = ({ route, navigation }) => {
       
       if (isFavorite) {
         // Eliminar de favoritos
-        const response = await fetch(`http://192.168.3.21:4000/api/favoritos/${user.id}/${product.id}`, {
-          method: 'DELETE',
+        await apiRequest(API_ENDPOINTS.REMOVE_FAVORITO(user.id, product.id), {
+          method: 'DELETE'
         });
-        
-        if (response.ok) {
-          setIsFavorite(false);
-          Alert.alert('Éxito', 'Producto eliminado de favoritos');
-        } else {
-          Alert.alert('Error', 'No se pudo eliminar de favoritos');
-        }
+        setIsFavorite(false);
+        Alert.alert('Éxito', 'Producto eliminado de favoritos');
       } else {
         // Agregar a favoritos
-        const response = await fetch(`http://192.168.3.21:4000/api/favoritos/${user.id}/${product.id}`, {
-          method: 'POST',
+        await apiRequest(API_ENDPOINTS.ADD_FAVORITO(user.id, product.id), {
+          method: 'POST'
         });
-        
-        if (response.ok) {
-          setIsFavorite(true);
-          Alert.alert('Éxito', 'Producto agregado a favoritos');
-        } else {
-          Alert.alert('Error', 'No se pudo agregar a favoritos');
-        }
+        setIsFavorite(true);
+        Alert.alert('Éxito', 'Producto agregado a favoritos');
       }
     } catch (error) {
       console.error('Error toggling favorite:', error);
-      Alert.alert('Error', 'Error de conexión');
+      Alert.alert('Error', 'No se pudo actualizar favoritos');
     } finally {
       setLoading(false);
     }

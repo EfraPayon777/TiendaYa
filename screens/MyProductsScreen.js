@@ -14,6 +14,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../contexts/AuthContext';
 import { useResponsive } from '../hooks/useResponsive';
+import { API_ENDPOINTS, apiRequest } from '../utils/api';
 
 const MyProductsScreen = ({ navigation }) => {
   const { user } = useAuth();
@@ -26,14 +27,8 @@ const MyProductsScreen = ({ navigation }) => {
   const fetchMyProducts = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`http://192.168.3.21:4000/api/usuarios/${user.id}/productos`);
-      const data = await response.json();
-      
-      if (response.ok) {
-        setProducts(data);
-      } else {
-        Alert.alert('Error', 'No se pudieron cargar tus productos');
-      }
+      const data = await apiRequest(API_ENDPOINTS.USUARIO_PRODUCTOS(user.id));
+      setProducts(data);
     } catch (error) {
       console.error('Error fetching my products:', error);
       Alert.alert('Error', 'Error de conexión con el servidor');

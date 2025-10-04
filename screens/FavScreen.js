@@ -14,6 +14,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../contexts/AuthContext';
 import { useResponsive } from '../hooks/useResponsive';
+import { API_ENDPOINTS, apiRequest } from '../utils/api';
 
 const FavScreen = ({ navigation }) => {
   const { user, isAuthenticated } = useAuth();
@@ -42,22 +43,12 @@ const FavScreen = ({ navigation }) => {
 
     try {
       setLoading(true);
-      console.log('🔍 Haciendo petición a:', `http://192.168.3.21:4000/api/favoritos/${user.id}`);
-      const response = await fetch(`http://192.168.3.21:4000/api/favoritos/${user.id}`);
-      console.log('🔍 Respuesta del servidor:', response.status);
-      const data = await response.json();
-      console.log('🔍 Datos recibidos:', data);
-      
-      if (response.ok) {
-        console.log('✅ Favoritos cargados exitosamente:', data.length, 'productos');
-        setProducts(data);
-      } else {
-        console.log('❌ Error en la respuesta del servidor');
-        Alert.alert('Error', 'No se pudieron cargar los favoritos');
-      }
+      const data = await apiRequest(API_ENDPOINTS.FAVORITOS_BY_USER(user.id));
+      console.log('✅ Favoritos cargados exitosamente:', data.length, 'productos');
+      setProducts(data);
     } catch (error) {
       console.error('❌ Error fetching favorites:', error);
-      Alert.alert('Error', 'Error de conexión con el servidor');
+      Alert.alert('Error', 'No se pudieron cargar los favoritos');
     } finally {
       setLoading(false);
     }
@@ -66,22 +57,18 @@ const FavScreen = ({ navigation }) => {
   // Función para eliminar de favoritos
   const removeFromFavorites = async (productId) => {
     try {
-      const response = await fetch(`http://192.168.3.21:4000/api/favoritos/${user.id}/${productId}`, {
-        method: 'DELETE',
+      await apiRequest(API_ENDPOINTS.REMOVE_FAVORITO(user.id, productId), {
+        method: 'DELETE'
       });
       
-      if (response.ok) {
-        // Actualizar la lista local
-        setProducts(prevProducts => 
-          prevProducts.filter(product => product.id !== productId)
-        );
-        Alert.alert('Éxito', 'Producto eliminado de favoritos');
-      } else {
-        Alert.alert('Error', 'No se pudo eliminar de favoritos');
-      }
+      // Actualizar la lista local
+      setProducts(prevProducts => 
+        prevProducts.filter(product => product.id !== productId)
+      );
+      Alert.alert('Éxito', 'Producto eliminado de favoritos');
     } catch (error) {
       console.error('Error removing from favorites:', error);
-      Alert.alert('Error', 'Error de conexión');
+      Alert.alert('Error', 'No se pudo eliminar de favoritos');
     }
   };
 

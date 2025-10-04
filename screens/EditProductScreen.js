@@ -17,6 +17,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../contexts/AuthContext';
 import { useResponsive } from '../hooks/useResponsive';
 import * as ImagePicker from 'expo-image-picker';
+import { API_ENDPOINTS, apiRequest } from '../utils/api';
 
 const EditProductScreen = ({ route, navigation }) => {
   const { product } = route.params;
@@ -41,17 +42,11 @@ const EditProductScreen = ({ route, navigation }) => {
 
   const fetchCategorias = async () => {
     try {
-      const response = await fetch('http://192.168.3.21:4000/api/categorias');
-      const data = await response.json();
-      
-      if (response.ok) {
-        setCategorias(data);
-      } else {
-        Alert.alert('Error', 'No se pudieron cargar las categorías');
-      }
+      const data = await apiRequest(API_ENDPOINTS.CATEGORIAS);
+      setCategorias(data);
     } catch (error) {
       console.error('Error fetching categories:', error);
-      Alert.alert('Error', 'Error de conexión con el servidor');
+      Alert.alert('Error', 'No se pudieron cargar las categorías');
     }
   };
 
@@ -126,11 +121,8 @@ const EditProductScreen = ({ route, navigation }) => {
 
     setLoading(true);
     try {
-      const response = await fetch(`http://192.168.3.21:4000/api/productos/${product.id}`, {
+      await apiRequest(API_ENDPOINTS.PRODUCTO_BY_ID(product.id), {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({
           nombre: formData.nombre,
           descripcion: formData.descripcion,
@@ -140,14 +132,9 @@ const EditProductScreen = ({ route, navigation }) => {
         }),
       });
 
-      if (response.ok) {
-        Alert.alert('Éxito', 'Producto actualizado correctamente', [
-          { text: 'OK', onPress: () => navigation.goBack() }
-        ]);
-      } else {
-        const error = await response.json();
-        Alert.alert('Error', error.message || 'No se pudo actualizar el producto');
-      }
+      Alert.alert('Éxito', 'Producto actualizado correctamente', [
+        { text: 'OK', onPress: () => navigation.goBack() }
+      ]);
     } catch (error) {
       console.error('Error updating product:', error);
       Alert.alert('Error', 'Error de conexión con el servidor');
@@ -167,20 +154,16 @@ const EditProductScreen = ({ route, navigation }) => {
           style: 'destructive',
           onPress: async () => {
             try {
-              const response = await fetch(`http://192.168.3.21:4000/api/productos/${product.id}`, {
+              await apiRequest(API_ENDPOINTS.PRODUCTO_BY_ID(product.id), {
                 method: 'DELETE',
               });
 
-              if (response.ok) {
-                Alert.alert('Éxito', 'Producto eliminado correctamente', [
-                  { text: 'OK', onPress: () => navigation.navigate('MyProducts') }
-                ]);
-              } else {
-                Alert.alert('Error', 'No se pudo eliminar el producto');
-              }
+              Alert.alert('Éxito', 'Producto eliminado correctamente', [
+                { text: 'OK', onPress: () => navigation.navigate('MyProducts') }
+              ]);
             } catch (error) {
               console.error('Error deleting product:', error);
-              Alert.alert('Error', 'Error de conexión con el servidor');
+              Alert.alert('Error', 'No se pudo eliminar el producto');
             }
           }
         }

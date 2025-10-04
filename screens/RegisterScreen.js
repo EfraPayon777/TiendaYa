@@ -16,6 +16,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useAuth } from '../contexts/AuthContext';
 import { useResponsive } from '../hooks/useResponsive';
+import { API_ENDPOINTS, apiRequest } from '../utils/api';
 
 const RegisterScreen = ({ navigation }) => {
   const { login } = useAuth();
@@ -77,11 +78,8 @@ const RegisterScreen = ({ navigation }) => {
     console.log('Validación exitosa, enviando datos...');
     setLoading(true);
     try {
-      const response = await fetch('http://192.168.3.21:4000/api/auth/register', {
+      const result = await apiRequest(API_ENDPOINTS.REGISTER, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({
           nombre: formData.nombre,
           email: formData.email,
@@ -89,27 +87,20 @@ const RegisterScreen = ({ navigation }) => {
           password: formData.password,
         }),
       });
-
-      const result = await response.json();
       console.log('Respuesta del servidor:', result);
 
-      if (response.ok) {
-        console.log('Registro exitoso, haciendo auto-login...');
-        // Auto-login después del registro
-        await login(result.data.user, result.data.token);
-        console.log('Auto-login completado, navegando a Home');
-        Alert.alert(
-          '¡Registro exitoso!',
-          'Tu cuenta ha sido creada correctamente',
-          [{ text: 'OK', onPress: () => navigation.navigate('Home') }]
-        );
-      } else {
-        console.log('Error en el registro:', result.message);
-        Alert.alert('Error', result.message || 'No se pudo crear la cuenta');
-      }
+      console.log('Registro exitoso, haciendo auto-login...');
+      // Auto-login después del registro
+      await login(result.data.user, result.data.token);
+      console.log('Auto-login completado, navegando a Home');
+      Alert.alert(
+        '¡Registro exitoso!',
+        'Tu cuenta ha sido creada correctamente',
+        [{ text: 'OK', onPress: () => navigation.navigate('Home') }]
+      );
     } catch (error) {
       console.error('Register error:', error);
-      Alert.alert('Error', 'Error de conexión con el servidor');
+      Alert.alert('Error', error.message || 'No se pudo crear la cuenta');
     } finally {
       setLoading(false);
     }

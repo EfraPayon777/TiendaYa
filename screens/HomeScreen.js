@@ -15,6 +15,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../contexts/AuthContext';
 import { useResponsive } from '../hooks/useResponsive';
+import { API_ENDPOINTS, apiRequest } from '../utils/api';
 
 const HomeScreen = ({ navigation }) => {
   const { isAuthenticated, user } = useAuth();
@@ -30,21 +31,12 @@ const HomeScreen = ({ navigation }) => {
     try {
       console.log('🔍 Iniciando carga de productos...');
       setLoading(true);
-      const response = await fetch('http://192.168.3.21:4000/api/productos');
-      console.log('🔍 Respuesta del servidor:', response.status);
-      const data = await response.json();
-      console.log('🔍 Datos recibidos:', data);
-      
-      if (response.ok) {
-        console.log('✅ Productos cargados exitosamente:', data.length, 'productos');
-        setProducts(data);
-      } else {
-        console.log('❌ Error en la respuesta del servidor');
-        Alert.alert('Error', 'No se pudieron cargar los productos');
-      }
+      const data = await apiRequest(API_ENDPOINTS.PRODUCTOS);
+      console.log('✅ Productos cargados exitosamente:', data.length, 'productos');
+      setProducts(data);
     } catch (error) {
       console.error('❌ Error fetching products:', error);
-      Alert.alert('Error', 'Error de conexión con el servidor');
+      Alert.alert('Error', 'No se pudieron cargar los productos');
     } finally {
       setLoading(false);
     }
@@ -54,15 +46,9 @@ const HomeScreen = ({ navigation }) => {
   const fetchCategorias = async () => {
     try {
       console.log('🔍 Cargando categorías...');
-      const response = await fetch('http://192.168.3.21:4000/api/categorias');
-      const data = await response.json();
-      
-      console.log('🔍 Categorías recibidas:', data);
-      
-      if (response.ok) {
-        setCategorias(data);
-        console.log('✅ Categorías cargadas:', data.length);
-      }
+      const data = await apiRequest(API_ENDPOINTS.CATEGORIAS);
+      console.log('✅ Categorías cargadas:', data.length);
+      setCategorias(data);
     } catch (error) {
       console.error('Error fetching categories:', error);
     }
