@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -25,6 +25,7 @@ const HomeScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
   const [searchText, setSearchText] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const scrollViewRef = useRef(null);
 
   // Obtener productos desde la API
   const fetchProducts = async () => {
@@ -39,6 +40,16 @@ const HomeScreen = ({ navigation }) => {
       Alert.alert('Error', 'No se pudieron cargar los productos');
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Refrescar y ir al inicio
+  const refreshAndGoToTop = async () => {
+    console.log('🔄 Refrescando y yendo al inicio...');
+    await fetchProducts();
+    // Hacer scroll hacia arriba
+    if (scrollViewRef.current) {
+      scrollViewRef.current.scrollTo({ y: 0, animated: true });
     }
   };
 
@@ -236,7 +247,7 @@ const HomeScreen = ({ navigation }) => {
       <StatusBar barStyle="dark-content" />
       
       {/* Header */}
-      <View style={styles.header}>
+      <TouchableOpacity style={styles.header} onPress={refreshAndGoToTop}>
         <View style={styles.headerText}>
           <Text style={styles.headerTitle}>TiendaYa</Text>
           <Text style={styles.headerSubtitle}>Encuentra lo que necesitas</Text>
@@ -307,7 +318,7 @@ const HomeScreen = ({ navigation }) => {
             placeholderTextColor="#9CA3AF"
           />
         </View>
-      </View>
+      </TouchableOpacity>
 
       {/* Filtros de categorías */}
       <View style={styles.categoriesContainer}>
@@ -336,6 +347,7 @@ const HomeScreen = ({ navigation }) => {
         </View>
 
         <FlatList
+          ref={scrollViewRef}
           data={filteredProducts}
           renderItem={renderProductCard}
           keyExtractor={(item) => item.id.toString()}

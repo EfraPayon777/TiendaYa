@@ -146,12 +146,13 @@ const EditProfileScreen = ({ navigation }) => {
         {/* Botón de retroceso */}
         <View style={styles.topBar}>
           <TouchableOpacity 
-            style={styles.backButton}
-            onPress={() => navigation.goBack()}
+            style={[styles.backButton, { opacity: 0 }]}
+            onPress={() => {}} // Desactivar acción
+            disabled={true} // Deshabilitar completamente
           >
             <Ionicons name="arrow-back" size={24} color="#1A1A1A" />
           </TouchableOpacity>
-          <Text style={styles.screenTitle}>Editar Perfil</Text>
+          <Text style={[styles.screenTitle, { opacity: 0 }]}>Editar Perfil</Text>
           <View style={styles.placeholder} />
         </View>
 

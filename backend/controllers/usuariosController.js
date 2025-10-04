@@ -24,6 +24,10 @@ async function getPerfil(req, res) {
 // Actualizar perfil de usuario
 async function updatePerfil(req, res) {
     try {
+        console.log('🔍 Actualizando perfil - ID:', req.params.id);
+        console.log('🔍 Body recibido:', req.body);
+        console.log('🔍 Archivo recibido:', req.file ? 'Sí' : 'No');
+        
         const { id } = req.params;
         const { nombre, telefono } = req.body;
         
@@ -34,6 +38,7 @@ async function updatePerfil(req, res) {
         if (req.file) {
             const baseUrl = `${req.protocol}://${req.get('host')}`;
             const fotoPerfil = `${baseUrl}/uploads/${req.file.filename}`;
+            console.log('🔍 Nueva foto de perfil:', fotoPerfil);
             updateQuery += ', foto_perfil = ?';
             queryParams.push(fotoPerfil);
         }
@@ -41,11 +46,15 @@ async function updatePerfil(req, res) {
         updateQuery += ' WHERE id = ?';
         queryParams.push(id);
         
+        console.log('🔍 Query final:', updateQuery);
+        console.log('🔍 Parámetros:', queryParams);
+        
         await pool.execute(updateQuery, queryParams);
         
+        console.log('✅ Perfil actualizado exitosamente');
         res.json({ message: 'Perfil actualizado exitosamente' });
     } catch (error) {
-        console.error('Error al actualizar perfil:', error);
+        console.error('❌ Error al actualizar perfil:', error);
         res.status(500).json({ error: 'Error interno del servidor' });
     }
 }

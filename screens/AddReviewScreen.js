@@ -9,6 +9,7 @@ import {
   Alert,
   ScrollView,
   Image,
+  TextInput,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../contexts/AuthContext';
@@ -21,6 +22,7 @@ const AddReviewScreen = ({ route, navigation }) => {
   const { user } = useAuth();
   const { isWeb, isDesktop, isTablet } = useResponsive();
   const [rating, setRating] = useState(0);
+  const [comentario, setComentario] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmitReview = async () => {
@@ -31,13 +33,19 @@ const AddReviewScreen = ({ route, navigation }) => {
 
     setLoading(true);
     try {
+      const reviewData = {
+        userId: user.id,
+        productoId: product.id,
+        rating: rating,
+        comentario: comentario.trim(),
+      };
+      
+      console.log('🔍 Enviando reseña:', reviewData);
+      console.log('🔍 Comentario a enviar:', comentario.trim());
+      
       await apiRequest(API_ENDPOINTS.REVIEWS, {
         method: 'POST',
-        body: JSON.stringify({
-          userId: user.id,
-          productoId: product.id,
-          rating: rating,
-        }),
+        body: JSON.stringify(reviewData),
       });
 
       Alert.alert('Éxito', 'Reseña enviada correctamente', [
@@ -45,7 +53,19 @@ const AddReviewScreen = ({ route, navigation }) => {
       ]);
     } catch (error) {
       console.error('Error submitting review:', error);
-      Alert.alert('Error', 'Error de conexión con el servidor');
+      
+      // Verificar si el error es porque ya existe una reseña
+      if (error.message && error.message.includes('Ya has calificado este producto')) {
+        Alert.alert(
+          'Reseña existente', 
+          'Ya has calificado este producto. Si quieres cambiar tu calificación, elimina la reseña actual y crea una nueva.',
+          [
+            { text: 'Entendido', style: 'default' }
+          ]
+        );
+      } else {
+        Alert.alert('Error', 'Error de conexión con el servidor');
+      }
     } finally {
       setLoading(false);
     }
@@ -58,12 +78,13 @@ const AddReviewScreen = ({ route, navigation }) => {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity 
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
+          style={[styles.backButton, { opacity: 0 }]}
+          onPress={() => {}} // Desactivar acción
+          disabled={true} // Deshabilitar completamente
         >
           <Ionicons name="arrow-back" size={24} color="#1A1A1A" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Dejar Reseña</Text>
+        <Text style={[styles.headerTitle, { opacity: 0 }]}>Dejar Reseña</Text>
         <View style={styles.placeholder} />
       </View>
 
@@ -106,6 +127,21 @@ const AddReviewScreen = ({ route, navigation }) => {
                rating === 4 ? 'Bueno' : 'Excelente'}
             </Text>
           )}
+        </View>
+
+        {/* Comentario */}
+        <View style={styles.commentSection}>
+          <Text style={styles.sectionTitle}>Comentario (opcional)</Text>
+          <TextInput
+            style={styles.commentInput}
+            value={comentario}
+            onChangeText={setComentario}
+            placeholder="Escribe tu opinión sobre este producto..."
+            placeholderTextColor="#9CA3AF"
+            multiline
+            numberOfLines={4}
+            textAlignVertical="top"
+          />
         </View>
 
         {/* Botón de enviar */}
@@ -226,6 +262,27 @@ const styles = StyleSheet.create({
     color: '#FC930A',
     fontWeight: '600',
     marginTop: 12,
+  },
+  commentSection: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 20,
+    marginBottom: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  commentInput: {
+    borderWidth: 1,
+    borderColor: '#D1D5DB',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    color: '#1F2937',
+    backgroundColor: '#F9FAFB',
+    minHeight: 100,
   },
   submitButton: {
     backgroundColor: '#FC930A',

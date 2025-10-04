@@ -17,6 +17,7 @@ import MyProductsScreen from './screens/MyProductsScreen';
 import ReviewsScreen from './screens/ReviewsScreen';
 import AddReviewScreen from './screens/AddReviewScreen';
 import EditProductScreen from './screens/EditProductScreen';
+import ProductReviewsScreen from './screens/ProductReviewsScreen';
 
 const Stack = createStackNavigator();
 
@@ -91,6 +92,11 @@ export default function App() {
             name="AddReview"
             component={AddReviewScreen}
             options={{ title: 'Dejar Reseña' }}
+          />
+          <Stack.Screen
+            name="ProductReviews"
+            component={ProductReviewsScreen}
+            options={{ title: 'Reseñas del Producto' }}
           />
           <Stack.Screen
             name="EditProduct"

@@ -17,11 +17,47 @@ import { useAuth } from '../contexts/AuthContext';
 import { API_ENDPOINTS, apiRequest } from '../utils/api';
 
 const ProductDetailScreen = ({ route, navigation }) => {
-  const { product } = route.params;
+  const { product: initialProduct } = route.params;
   const { user } = useAuth();
+  const [product, setProduct] = useState(initialProduct);
   const [isFavorite, setIsFavorite] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [reviews, setReviews] = useState([]);
+  const [userHasReviewed, setUserHasReviewed] = useState(false);
 
+  // Log para debug
+  console.log('🔍 Producto inicial:', initialProduct);
+  console.log('🔍 Producto actual:', product);
+  console.log('🔍 Foto del vendedor:', product.vendedor_foto);
+
+  // Cargar datos completos del producto
+  const fetchProductDetails = async () => {
+    try {
+      const productDetails = await apiRequest(API_ENDPOINTS.PRODUCTO_BY_ID(product.id));
+      console.log('🔍 Producto completo cargado:', productDetails);
+      console.log('🔍 Foto del vendedor completa:', productDetails.vendedor_foto);
+      console.log('🔍 Imagen del producto:', productDetails.imagen);
+      setProduct(productDetails);
+    } catch (error) {
+      console.error('Error fetching product details:', error);
+    }
+  };
+
+  // Cargar reseñas del producto
+  const fetchReviews = async () => {
+    try {
+      const data = await apiRequest(API_ENDPOINTS.REVIEWS_BY_PRODUCT(product.id));
+      setReviews(data);
+      
+      // Verificar si el usuario ya hizo una reseña
+      if (user && user.id) {
+        const userReview = data.find(review => review.usuario_id === user.id);
+        setUserHasReviewed(!!userReview);
+      }
+    } catch (error) {
+      console.error('Error fetching reviews:', error);
+    }
+  };
 
   // Verificar si el producto está en favoritos
   const checkFavorite = async () => {
@@ -42,7 +78,9 @@ const ProductDetailScreen = ({ route, navigation }) => {
   };
 
   useEffect(() => {
+    fetchProductDetails();
     checkFavorite();
+    fetchReviews();
   }, []);
 
   const toggleFavorite = async () => {
@@ -86,7 +124,12 @@ const ProductDetailScreen = ({ route, navigation }) => {
   };
 
   const handleWhatsAppContact = () => {
-    const phoneNumber = product.telefono || '50370000000'; // Número del vendedor desde la base de datos
+    if (!product.telefono) {
+      Alert.alert('Error', 'El vendedor no tiene número de teléfono registrado');
+      return;
+    }
+    
+    const phoneNumber = product.telefono;
     const message = `Hola! Me interesa el producto "${product.nombre}" que vi en TiendaYa. ¿Está disponible?`;
     const url = `whatsapp://send?phone=${phoneNumber}&text=${encodeURIComponent(message)}`;
     
@@ -123,12 +166,33 @@ const ProductDetailScreen = ({ route, navigation }) => {
       Alert.alert('No permitido', 'No puedes calificar tu propio producto');
       return;
     }
+
+    // Verificar si el usuario ya hizo una reseña
+    if (userHasReviewed) {
+      Alert.alert(
+        'Reseña existente',
+        'Ya has calificado este producto. Si quieres cambiar tu calificación, elimina la reseña actual y crea una nueva.',
+        [
+          { text: 'Entendido', style: 'default' }
+        ]
+      );
+      return;
+    }
     
     navigation.navigate('AddReview', { product });
   };
 
+  const handleViewReviews = () => {
+    navigation.navigate('ProductReviews', { product });
+  };
+
   const handleCallVendor = () => {
-    const phoneNumber = product.telefono || '50370000000'; // Número del vendedor desde la base de datos
+    if (!product.telefono) {
+      Alert.alert('Error', 'El vendedor no tiene número de teléfono registrado');
+      return;
+    }
+    
+    const phoneNumber = product.telefono;
     const url = `tel:${phoneNumber}`;
     
     Linking.canOpenURL(url)
@@ -152,8 +216,9 @@ const ProductDetailScreen = ({ route, navigation }) => {
       {/* Header con botones */}
       <View style={styles.header}>
         <TouchableOpacity 
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
+          style={[styles.backButton, { opacity: 0 }]}
+          onPress={() => {}} // Desactivar acción
+          disabled={true} // Deshabilitar completamente
         >
           <Ionicons name="arrow-back" size={24} color="#1F2937" />
         </TouchableOpacity>
@@ -220,6 +285,15 @@ const ProductDetailScreen = ({ route, navigation }) => {
                 : 'Sin reseñas'
               }
             </Text>
+            
+            {/* Botón Ver Reseñas */}
+            <TouchableOpacity 
+              style={styles.viewReviewsButtonInline}
+              onPress={handleViewReviews}
+            >
+              <Ionicons name="chatbubbles" size={16} color="#3B82F6" />
+              <Text style={styles.viewReviewsButtonTextInline}>Ver Reseñas</Text>
+            </TouchableOpacity>
           </View>
 
           <Text style={styles.descriptionTitle}>Descripción</Text>
@@ -230,7 +304,15 @@ const ProductDetailScreen = ({ route, navigation }) => {
             <Text style={styles.vendorTitle}>Vendedor</Text>
             <View style={styles.vendorInfo}>
               <View style={styles.vendorAvatar}>
-                <Ionicons name="person" size={24} color="#FC930A" />
+                {product.vendedor_foto ? (
+                  <Image 
+                    source={{ uri: product.vendedor_foto }} 
+                    style={styles.vendorImage}
+                    resizeMode="cover"
+                  />
+                ) : (
+                  <Ionicons name="person" size={24} color="#FC930A" />
+                )}
               </View>
               <View style={styles.vendorDetails}>
                 <Text style={styles.vendorName}>{product.vendedor}</Text>
@@ -252,8 +334,10 @@ const ProductDetailScreen = ({ route, navigation }) => {
           style={styles.callButton}
           onPress={handleCallVendor}
         >
-          <Ionicons name="call" size={20} color="#FFFFFF" />
-          <Text style={styles.callButtonText}>Llamar</Text>
+          <View style={styles.buttonContent}>
+            <Ionicons name="call" size={24} color="#FFFFFF" />
+            <Text style={styles.callButtonText}>Llamar</Text>
+          </View>
         </TouchableOpacity>
 
         <TouchableOpacity 
@@ -266,8 +350,10 @@ const ProductDetailScreen = ({ route, navigation }) => {
             end={{ x: 1, y: 1 }}
             style={styles.whatsappGradient}
           >
-            <Ionicons name="logo-whatsapp" size={20} color="#FFFFFF" />
-            <Text style={styles.whatsappButtonText}>WhatsApp</Text>
+            <View style={styles.buttonContent}>
+              <Ionicons name="logo-whatsapp" size={24} color="#FFFFFF" />
+              <Text style={styles.whatsappButtonText}>WhatsApp</Text>
+            </View>
           </LinearGradient>
         </TouchableOpacity>
 
@@ -281,8 +367,10 @@ const ProductDetailScreen = ({ route, navigation }) => {
             end={{ x: 1, y: 1 }}
             style={styles.reviewGradient}
           >
-            <Ionicons name="star" size={20} color="#FFFFFF" />
-            <Text style={styles.reviewButtonText}>Dejar Reseña</Text>
+            <View style={styles.buttonContent}>
+              <Ionicons name="star" size={24} color="#FFFFFF" />
+              <Text style={styles.reviewButtonText}>Dejar Reseña</Text>
+            </View>
           </LinearGradient>
         </TouchableOpacity>
       </View>
@@ -372,6 +460,24 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#6B7280',
   },
+  viewReviewsButtonInline: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#F3F4F6',
+    borderRadius: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    marginTop: 12,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  viewReviewsButtonTextInline: {
+    color: '#3B82F6',
+    fontSize: 14,
+    fontWeight: '500',
+    marginLeft: 6,
+  },
   descriptionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
@@ -407,6 +513,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
+    overflow: 'hidden',
+  },
+  vendorImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
   },
   vendorDetails: {
     flex: 1,
@@ -428,9 +540,14 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: '#E5E7EB',
   },
+  buttonContent: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 8,
+  },
   callButton: {
     flex: 1,
-    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#6B7280',
@@ -441,7 +558,8 @@ const styles = StyleSheet.create({
   callButtonText: {
     color: '#FFFFFF',
     fontWeight: '600',
-    marginLeft: 8,
+    marginTop: 4,
+    fontSize: 12,
   },
   whatsappButton: {
     flex: 2,
@@ -450,13 +568,31 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   whatsappGradient: {
-    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 16,
   },
   whatsappButtonText: {
     color: '#FFFFFF',
+    fontWeight: '600',
+    marginTop: 4,
+    fontSize: 12,
+  },
+  viewReviewsButton: {
+    flex: 1,
+    marginLeft: 8,
+  },
+  viewReviewsGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+  },
+  viewReviewsButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
     fontWeight: '600',
     marginLeft: 8,
   },
@@ -465,18 +601,17 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   reviewGradient: {
-    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 12,
+    paddingVertical: 16,
     paddingHorizontal: 16,
     borderRadius: 8,
   },
   reviewButtonText: {
     color: '#FFFFFF',
-    fontSize: 16,
+    fontSize: 12,
     fontWeight: '600',
-    marginLeft: 8,
+    marginTop: 4,
   },
 });
 

@@ -9,6 +9,7 @@ async function getReseñasProducto(req, res) {
             SELECT 
                 pr.id,
                 pr.rating,
+                pr.comentario,
                 pr.creadoEn,
                 u.nombre as usuario_nombre,
                 u.id as usuario_id
@@ -28,7 +29,9 @@ async function getReseñasProducto(req, res) {
 // Crear reseña
 async function crearReseña(req, res) {
     try {
-        const { userId, productoId, rating } = req.body;
+        console.log('🔍 Creando reseña - Body recibido:', req.body);
+        const { userId, productoId, rating, comentario } = req.body;
+        console.log('🔍 Comentario recibido:', comentario);
         
         // Verificar si ya existe una reseña del usuario para este producto
         const [existing] = await pool.query(
@@ -42,8 +45,8 @@ async function crearReseña(req, res) {
         
         // Crear nueva reseña
         await pool.execute(
-            'INSERT INTO producto_ratings (user_id, producto_id, rating) VALUES (?, ?, ?)',
-            [userId, productoId, rating]
+            'INSERT INTO producto_ratings (user_id, producto_id, rating, comentario) VALUES (?, ?, ?, ?)',
+            [userId, productoId, rating, comentario || null]
         );
         
         res.json({ message: 'Reseña creada exitosamente' });

@@ -56,6 +56,7 @@ export const API_ENDPOINTS = {
   // Reviews
   REVIEWS: `${API_BASE_URL}/api/reviews`,
   REVIEWS_BY_USER: (userId) => `${API_BASE_URL}/api/reviews/usuario/${userId}`,
+  REVIEWS_BY_PRODUCT: (productId) => `${API_BASE_URL}/api/reviews/producto/${productId}`,
   REVIEW_BY_USER_PRODUCT: (userId, productId) => `${API_BASE_URL}/api/reviews/${userId}/${productId}`,
 };
 
