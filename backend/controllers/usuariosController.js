@@ -6,7 +6,7 @@ async function getPerfil(req, res) {
         const { id } = req.params;
         
         const [rows] = await pool.query(
-            'SELECT id, nombre, email, telefono, creadoEn FROM usuarios WHERE id = ?',
+            'SELECT id, nombre, email, telefono, creadoEn, foto_perfil, estado FROM usuarios WHERE id = ?',
             [id]
         );
         
@@ -27,10 +27,21 @@ async function updatePerfil(req, res) {
         const { id } = req.params;
         const { nombre, telefono } = req.body;
         
-        await pool.execute(
-            'UPDATE usuarios SET nombre = ?, telefono = ? WHERE id = ?',
-            [nombre, telefono, id]
-        );
+        // Manejar foto de perfil si se subió una nueva
+        let updateQuery = 'UPDATE usuarios SET nombre = ?, telefono = ?';
+        let queryParams = [nombre, telefono];
+        
+        if (req.file) {
+            const baseUrl = `${req.protocol}://${req.get('host')}`;
+            const fotoPerfil = `${baseUrl}/uploads/${req.file.filename}`;
+            updateQuery += ', foto_perfil = ?';
+            queryParams.push(fotoPerfil);
+        }
+        
+        updateQuery += ' WHERE id = ?';
+        queryParams.push(id);
+        
+        await pool.execute(updateQuery, queryParams);
         
         res.json({ message: 'Perfil actualizado exitosamente' });
     } catch (error) {

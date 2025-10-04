@@ -16,7 +16,8 @@ const PORT = 4000;
 app.use(cors());
 app.use(express.json());
 
-// Configuración simplificada - sin guardado de imágenes
+// Servir archivos estáticos
+app.use('/uploads', express.static('uploads'));
 
 // Middleware de debug para ver todas las rutas
 app.use((req, res, next) => {
@@ -95,6 +96,7 @@ app.get('/api/debug/update-images', async (req, res) => {
     }
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
     console.log(`✅ Servidor backend corriendo en http://localhost:${PORT}`);
+    console.log(`✅ También accesible desde la red local en http://192.168.3.21:${PORT}`);
 });

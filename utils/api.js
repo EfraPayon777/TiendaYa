@@ -4,17 +4,24 @@ import Constants from 'expo-constants';
 // Función para obtener automáticamente la URL del backend
 const getBackendURL = () => {
   if (__DEV__) {
-    // En desarrollo, Expo detecta automáticamente la IP
+    // Detectar si estamos en dispositivo físico o emulador
     const debuggerHost = Constants.expoGoConfig?.debuggerHost;
+    console.log('🔍 Debug - debuggerHost detectado:', debuggerHost);
     
     if (debuggerHost) {
-      // Extraer la IP del debugger host (formato: "192.168.1.100:8081")
+      // Dispositivo físico - usar IP de la red
       const ip = debuggerHost.split(':')[0];
-      return `http://${ip}:4000`;
+      const url = `http://${ip}:4000`;
+      console.log('🔍 Debug - Dispositivo físico detectado, IP:', ip);
+      console.log('🔍 Debug - URL del backend:', url);
+      return url;
+    } else {
+      // Emulador - usar localhost
+      const url = 'http://localhost:4000';
+      console.log('🔍 Debug - Emulador detectado, usando localhost');
+      console.log('🔍 Debug - URL del backend:', url);
+      return url;
     }
-    
-    // Fallback a localhost si no se detecta
-    return 'http://localhost:4000';
   }
   
   // En producción
@@ -56,16 +63,26 @@ export const API_ENDPOINTS = {
 export const apiRequest = async (url, options = {}) => {
   try {
     console.log('🌐 Petición a:', url);
+    
+    // Configurar headers por defecto
+    const defaultHeaders = {};
+    
+    // Solo agregar Content-Type si no es FormData
+    if (!(options.body instanceof FormData)) {
+      defaultHeaders['Content-Type'] = 'application/json';
+    }
+    
     const response = await fetch(url, {
       headers: {
-        'Content-Type': 'application/json',
+        ...defaultHeaders,
         ...options.headers,
       },
       ...options,
     });
     
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
     }
     
     return await response.json();

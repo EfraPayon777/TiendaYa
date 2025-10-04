@@ -11,6 +11,7 @@ import {
   Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
 import { useAuth } from '../contexts/AuthContext';
 import { useResponsive } from '../hooks/useResponsive';
 import { API_ENDPOINTS, apiRequest } from '../utils/api';
@@ -25,7 +26,9 @@ const ProfileScreen = ({ navigation }) => {
     telefono: '',
     estado: 'active',
     creadoEn: '',
+    foto_perfil: null,
   });
+  const [imageKey, setImageKey] = useState(0); // Para forzar refresco de imagen
   const [stats, setStats] = useState({
     productos: 0,
     favoritos: 0,
@@ -41,7 +44,22 @@ const ProfileScreen = ({ navigation }) => {
       if (user) {
         console.log('🔍 Usuario del contexto:', user);
         console.log('🔍 Fecha de creación del usuario:', user.creadoEn);
-        setUserData(user);
+        
+        // Obtener datos completos del usuario incluyendo foto de perfil
+        try {
+          const userProfile = await apiRequest(API_ENDPOINTS.USUARIO_BY_ID(user.id));
+          console.log('🔍 Perfil completo del usuario:', userProfile);
+          setUserData(userProfile);
+          
+          // Actualizar también el contexto del usuario para sincronizar
+          if (userProfile.foto_perfil) {
+            console.log('🔄 Actualizando contexto con nueva foto:', userProfile.foto_perfil);
+          }
+        } catch (error) {
+          console.log('⚠️ No se pudo obtener perfil completo, usando datos del contexto');
+          setUserData(user);
+        }
+        
         await fetchUserStats();
       } else {
         // Si no hay usuario autenticado, redirigir al login
@@ -86,9 +104,103 @@ const ProfileScreen = ({ navigation }) => {
     }
   };
 
+  const selectImage = async () => {
+    try {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permisos', 'Se necesitan permisos para acceder a la galería');
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      });
+
+      if (!result.canceled && result.assets[0]) {
+        await updateProfilePhoto(result.assets[0].uri);
+      }
+    } catch (error) {
+      console.error('Error al seleccionar imagen:', error);
+      Alert.alert('Error', 'No se pudo seleccionar la imagen');
+    }
+  };
+
+  const takePhoto = async () => {
+    try {
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permisos', 'Se necesitan permisos para acceder a la cámara');
+        return;
+      }
+
+      const result = await ImagePicker.launchCameraAsync({
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      });
+
+      if (!result.canceled && result.assets[0]) {
+        await updateProfilePhoto(result.assets[0].uri);
+      }
+    } catch (error) {
+      console.error('Error al tomar foto:', error);
+      Alert.alert('Error', 'No se pudo tomar la foto');
+    }
+  };
+
+  const updateProfilePhoto = async (imageUri) => {
+    try {
+      setLoading(true);
+      
+      const dataToSend = new FormData();
+      dataToSend.append('nombre', userData.nombre);
+      dataToSend.append('telefono', userData.telefono);
+      dataToSend.append('fotoPerfil', {
+        uri: imageUri,
+        type: 'image/jpeg',
+        name: 'perfil.jpg'
+      });
+
+      console.log('📸 Actualizando foto de perfil...');
+      
+      await apiRequest(API_ENDPOINTS.USUARIO_BY_ID(user.id), {
+        method: 'PUT',
+        body: dataToSend,
+      });
+
+      console.log('✅ Foto actualizada, recargando datos...');
+      
+      // Recargar los datos del usuario para obtener la URL completa
+      await fetchUserData();
+      
+      // Forzar refresco de la imagen
+      setImageKey(prev => prev + 1);
+      
+      Alert.alert('Éxito', 'Foto de perfil actualizada correctamente');
+    } catch (error) {
+      console.error('❌ Error al actualizar foto:', error);
+      Alert.alert('Error', 'No se pudo actualizar la foto de perfil: ' + error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchUserData();
   }, []);
+
+  // Refrescar datos cuando se enfoca la pantalla
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      console.log('🔄 Pantalla enfocada, refrescando datos...');
+      fetchUserData();
+    });
+
+    return unsubscribe;
+  }, [navigation]);
 
   const formatJoinDate = (dateString) => {
     if (!dateString) {
@@ -196,10 +308,26 @@ const ProfileScreen = ({ navigation }) => {
         <View style={styles.profileHeader}>
           <View style={styles.avatarContainer}>
             <Image
-              source={{ uri: 'https://freesvg.org/img/defaultprofile.png' }}
+              key={imageKey}
+              source={{ 
+                uri: userData.foto_perfil || 'https://freesvg.org/img/defaultprofile.png' 
+              }}
               style={styles.avatar}
             />
-            <TouchableOpacity style={styles.editAvatarButton}>
+            <TouchableOpacity 
+              style={styles.editAvatarButton}
+              onPress={() => {
+                Alert.alert(
+                  'Cambiar foto de perfil',
+                  '¿Cómo quieres cambiar tu foto?',
+                  [
+                    { text: 'Galería', onPress: selectImage },
+                    { text: 'Cámara', onPress: takePhoto },
+                    { text: 'Cancelar', style: 'cancel' }
+                  ]
+                );
+              }}
+            >
               <Ionicons name="camera" size={16} color="#FFFFFF" />
             </TouchableOpacity>
           </View>

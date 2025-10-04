@@ -102,15 +102,23 @@ const PostProductScreen = ({ navigation }) => {
     console.log('Validación exitosa, enviando datos...');
     setLoading(true);
     try {
-      // Crear objeto JSON para enviar datos (sin imagen)
-      const dataToSend = {
-        categoria_id: formData.categoria_id,
-        nombre: formData.nombre,
-        descripcion: formData.descripcion,
-        precio: formData.precio,
-        stock: formData.stock,
-        vendedorId: user.id
-      };
+      // Crear FormData para enviar datos con imagen
+      const dataToSend = new FormData();
+      dataToSend.append('categoria_id', formData.categoria_id);
+      dataToSend.append('nombre', formData.nombre);
+      dataToSend.append('descripcion', formData.descripcion);
+      dataToSend.append('precio', formData.precio);
+      dataToSend.append('stock', formData.stock);
+      dataToSend.append('vendedorId', user.id);
+      
+      // Agregar imagen si existe
+      if (formData.imagen) {
+        dataToSend.append('imagen', {
+          uri: formData.imagen,
+          type: 'image/jpeg',
+          name: 'producto.jpg'
+        });
+      }
       
       console.log('VendedorId a enviar:', user.id);
       console.log('Datos a enviar:', dataToSend);
@@ -118,7 +126,8 @@ const PostProductScreen = ({ navigation }) => {
       console.log('Enviando datos al servidor...');
       const result = await apiRequest(API_ENDPOINTS.PRODUCTOS, {
         method: 'POST',
-        body: JSON.stringify(dataToSend),
+        body: dataToSend,
+        // No especificar Content-Type, React Native lo maneja automáticamente con FormData
       });
 
       console.log('Resultado:', result);

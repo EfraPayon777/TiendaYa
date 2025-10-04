@@ -45,10 +45,17 @@ const register = async (req, res) => {
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
+    // Manejar foto de perfil
+    let fotoPerfil = null;
+    if (req.file) {
+      const baseUrl = `${req.protocol}://${req.get('host')}`;
+      fotoPerfil = `${baseUrl}/uploads/${req.file.filename}`;
+    }
+
     // Crear usuario
     const [result] = await pool.execute(
-      'INSERT INTO usuarios (nombre, email, telefono, pwdHash, estado) VALUES (?, ?, ?, ?, ?)',
-      [nombre, email, telefono, hashedPassword, 'active']
+      'INSERT INTO usuarios (nombre, email, telefono, pwdHash, estado, foto_perfil) VALUES (?, ?, ?, ?, ?, ?)',
+      [nombre, email, telefono, hashedPassword, 'active', fotoPerfil]
     );
 
     const userId = result.insertId;

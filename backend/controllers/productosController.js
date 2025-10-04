@@ -99,9 +99,18 @@ async function createProducto(req, res) {
         const productoId = result.insertId;
         console.log('✅ Producto creado con ID:', productoId);
 
-        // Usar placeholder más confiable
-        const imgUrl = `https://dummyimage.com/300x200/FC930A/FFFFFF&text=${encodeURIComponent(nombre)}`;
-        console.log('✅ Imagen placeholder guardada:', imgUrl);
+        // Manejar imagen real o placeholder
+        let imgUrl;
+        if (req.file) {
+            // Usar imagen real subida con URL completa
+            const baseUrl = `${req.protocol}://${req.get('host')}`;
+            imgUrl = `${baseUrl}/uploads/${req.file.filename}`;
+            console.log('✅ Imagen real guardada:', imgUrl);
+        } else {
+            // Usar placeholder si no hay imagen
+            imgUrl = `https://dummyimage.com/300x200/FC930A/FFFFFF&text=${encodeURIComponent(nombre)}`;
+            console.log('✅ Imagen placeholder guardada:', imgUrl);
+        }
         
         await pool.execute(
             'INSERT INTO producto_img (producto_id, img_url, principal, orden) VALUES (?, ?, ?, ?)',
