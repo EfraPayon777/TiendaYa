@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  # Base de datos MySQL
+  mysql:
+    image: mysql:8.0
+    container_name: tiendaya_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: tiendaya
+      MYSQL_USER: tiendaya_user
+      MYSQL_PASSWORD: tiendaya_password
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - tiendaya_network
+
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: tiendaya_backend
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_NAME=tiendaya
+      - DB_USER=tiendaya_user
+      - DB_PASSWORD=tiendaya_password
+    ports:
+      - "4000:4000"
+    depends_on:
+      - mysql
+    volumes:
+      - ./backend/uploads:/app/uploads
+    networks:
+      - tiendaya_network
+
+  # Frontend Expo
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tiendaya_frontend
+    restart: unless-stopped
+    environment:
+      - EXPO_DEVTOOLS_LISTEN_ADDRESS=localhost
+    ports:
+      - "8081:8081"
+    depends_on:
+      - backend
+    networks:
+      - tiendaya_network
+
+volumes:
+  mysql_data:
+
+networks:
+  tiendaya_network:
+    driver: bridge

@@ -1,25 +1,34 @@
-# 🛒 TiendaYa - E-commerce Mobile App
+# TiendaYa - E-commerce Mobile App
 
 Una aplicación móvil completa de e-commerce desarrollada con React Native y Expo.
 
-## ✨ Características
+## Características
 
-- 🛍️ **Catálogo de Productos** - Navegación y búsqueda
-- 👤 **Sistema de Usuarios** - Registro, login y perfiles
-- ❤️ **Favoritos** - Guardar productos favoritos
-- ⭐ **Reseñas** - Sistema de calificaciones
-- 📸 **Fotos de Perfil** - Subida y gestión de imágenes
-- 🔄 **Detección Automática** - Sin configuración manual
+- **Catálogo de Productos** - Navegación y búsqueda
+- **Sistema de Usuarios** - Registro, login y perfiles
+- **Favoritos** - Guardar productos favoritos
+- **Reseñas** - Sistema de calificaciones con comentarios
+- **Fotos de Perfil** - Subida y gestión de imágenes
+- **Detección Automática** - Sin configuración manual de IPs
+- **Docker Support** - Contenerización completa
 
-## 🚀 Inicio Rápido
+## Requisitos Previos
 
-### **1. Clonar el Repositorio**
+- Node.js 18+
+- MySQL 8.0+
+- Docker y Docker Compose (opcional)
+- Expo CLI
+- Git
+
+## Instalación
+
+### 1. Clonar el Repositorio
 ```bash
 git clone [URL_DEL_REPOSITORIO]
 cd TiendaYa
 ```
 
-### **2. Instalar Dependencias**
+### 2. Instalar Dependencias
 ```bash
 # Frontend
 npm install
@@ -30,94 +39,242 @@ npm install
 cd ..
 ```
 
-### **3. Configurar Base de Datos**
+## Configuración de Base de Datos
+
+### Opción A: MySQL Local
 1. Crear base de datos MySQL: `tiendaya`
-2. Importar el esquema de la base de datos
-3. Configurar credenciales en `backend/config/db.js`
+2. Usuario: `root`, Contraseña: `2005`
+3. Importar el esquema desde `database/init.sql`
 
-### **4. Iniciar Servicios**
+### Opción B: Docker (Recomendado)
 ```bash
-# Terminal 1: Backend
-cd backend
-npm start
-
-# Terminal 2: Frontend
-npm start
+# Iniciar con Docker
+docker-compose up -d
 ```
 
-## 🔧 Configuración Automática
+## Modos de Ejecución
 
-**¡No necesitas configurar IPs manualmente!** El sistema detecta automáticamente:
+### Modo Local (Desarrollo)
 
-- 📱 **Dispositivo Físico**: IP de tu red local
-- 💻 **Emulador**: localhost automáticamente
-- 🌐 **Producción**: URL de producción
+#### Iniciar Backend
+```bash
+cd backend
+node server.js
+```
 
-## 📱 Funcionalidades
+#### Iniciar Frontend
+```bash
+npm start
+# o
+npx expo start --host tunnel
+```
 
-### **Autenticación**
+### Modo Docker (Producción/Colaboración)
+
+#### Iniciar Todo con Docker
+```bash
+# Iniciar todos los servicios
+docker-compose up -d
+
+# Ver estado
+docker-compose ps
+
+# Ver logs
+docker-compose logs -f
+```
+
+#### Comandos Docker Útiles
+```bash
+# Detener servicios
+docker-compose down
+
+# Reiniciar servicios
+docker-compose restart
+
+# Limpiar todo
+docker-compose down -v
+```
+
+## Scripts de Automatización
+
+### Scripts para Modo Local
+```bash
+# Iniciar en modo local
+./scripts/start-local-simple.sh
+
+# Detener todo
+./scripts/stop-all.sh
+```
+
+### Scripts para Docker
+```bash
+# Iniciar con Docker
+./scripts/start-docker-simple.sh
+
+# Detener todo
+./scripts/stop-all.sh
+```
+
+## Configuración Automática
+
+**No necesitas configurar IPs manualmente!** El sistema detecta automáticamente:
+
+- **Dispositivo Físico**: IP de tu red local
+- **Emulador**: localhost automáticamente
+- **Docker**: Variables de entorno automáticas
+- **Producción**: URL de producción
+
+## Funcionalidades
+
+### Autenticación
 - Registro de usuarios con foto de perfil
 - Login seguro con JWT
 - Gestión de perfiles
+- Actualización de datos personales
 
-### **Productos**
+### Productos
 - CRUD completo de productos
-- Subida de imágenes
+- Subida de imágenes múltiples
 - Categorías y filtros
-- Sistema de búsqueda
+- Sistema de búsqueda avanzado
+- Información del vendedor
 
-### **Interacción**
+### Interacción
 - Sistema de favoritos
-- Reseñas y calificaciones
+- Reseñas y calificaciones con comentarios
 - Navegación intuitiva
+- Contacto directo con vendedores (WhatsApp, llamadas)
 
-## 🛠️ Tecnologías
+## Tecnologías
 
 - **Frontend**: React Native, Expo
 - **Backend**: Node.js, Express
-- **Base de Datos**: MySQL
+- **Base de Datos**: MySQL 8.0
 - **Autenticación**: JWT
 - **Archivos**: Multer
 - **UI**: Componentes nativos
+- **Docker**: Contenerización completa
 
-## 📁 Estructura
+## Estructura del Proyecto
 
 ```
 TiendaYa/
-├── backend/           # Servidor Node.js
-├── screens/          # Pantallas de la app
-├── components/       # Componentes reutilizables
-├── contexts/         # Contextos de React
-├── utils/           # Utilidades (API automática)
-└── assets/          # Recursos estáticos
+├── backend/                 # Servidor Node.js
+│   ├── config/             # Configuración de BD
+│   ├── controllers/        # Controladores
+│   ├── routes/            # Rutas de API
+│   └── uploads/           # Archivos subidos
+├── screens/               # Pantallas de la app
+├── components/            # Componentes reutilizables
+├── contexts/              # Contextos de React
+├── utils/                 # Utilidades (API automática)
+├── database/              # Scripts de BD
+├── scripts/               # Scripts de automatización
+├── docker-compose.yml     # Configuración Docker
+└── Dockerfile            # Imagen Docker
 ```
 
-## 🚀 Comandos
+## Comandos Principales
 
+### Desarrollo Local
 ```bash
-# Desarrollo
-npm start                    # Iniciar Expo
-cd backend && npm start     # Iniciar backend
+# Iniciar backend
+cd backend
+node server.js
+
+# Iniciar frontend
+npm start
 
 # Limpiar caché
 expo start --clear
-
-# Producción
-npm run build
 ```
 
-## 📖 Documentación
+### Docker
+```bash
+# Construir imágenes
+docker-compose build
 
-- [Guía para Desarrolladores](SETUP-DESARROLLADORES.md)
-- [Migración de IPs](README-MIGRACION.md)
+# Iniciar servicios
+docker-compose up -d
 
-## 🎯 Estado del Proyecto
+# Ver logs
+docker-compose logs -f
 
-- ✅ **100% Funcional**
-- ✅ **Sin Hardcoding**
-- ✅ **Detección Automática**
-- ✅ **Listo para Producción**
+# Detener servicios
+docker-compose down
+```
+
+### Scripts de Automatización
+```bash
+# Modo local
+./scripts/start-local-simple.sh
+
+# Modo Docker
+./scripts/start-docker-simple.sh
+
+# Detener todo
+./scripts/stop-all.sh
+```
+
+## Puertos y URLs
+
+### Modo Local
+- **Frontend**: http://localhost:8081
+- **Backend**: http://localhost:4000
+- **MySQL**: localhost:3306
+
+### Modo Docker
+- **Frontend**: http://localhost:8081
+- **Backend**: http://localhost:4000
+- **MySQL**: localhost:3307
+
+## Solución de Problemas
+
+### Error de Puerto Ocupado
+```bash
+# Liberar puertos
+./scripts/stop-all.sh
+```
+
+### Error de Conexión a BD
+```bash
+# Verificar MySQL
+docker-compose logs mysql
+
+# Reiniciar backend
+docker-compose restart backend
+```
+
+### Error de Expo
+```bash
+# Limpiar caché
+expo start --clear
+
+# Reinstalar dependencias
+rm -rf node_modules
+npm install
+```
+
+## Estado del Proyecto
+
+- **100% Funcional**
+- **Sin Hardcoding**
+- **Detección Automática**
+- **Docker Support**
+- **Listo para Producción**
+
+## Contribución
+
+1. Fork el proyecto
+2. Crear rama feature (`git checkout -b feature/nueva-funcionalidad`)
+3. Commit cambios (`git commit -m 'Agregar nueva funcionalidad'`)
+4. Push a la rama (`git push origin feature/nueva-funcionalidad`)
+5. Abrir Pull Request
+
+## Licencia
+
+Este proyecto está bajo la Licencia MIT.
 
 ---
 
-**¡El proyecto está listo para usar sin configuración manual!** 🎉
+**El proyecto está listo para usar sin configuración manual!**
