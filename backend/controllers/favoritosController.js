@@ -1,11 +1,11 @@
 const pool = require('../config/db');
 
-// GET /api/favoritos - Obtener todos los favoritos (para pruebas)
+// GET /api/favoritos - Obtener todos los favoritos 
 async function getAllFavoritos(req, res) {
     try {
         console.log('🔍 Intentando obtener todos los favoritos...');
         
-        // Primero verificar si hay favoritos en la tabla
+        // Primero verifico si hay favoritos en la tabla
         const [countResult] = await pool.query('SELECT COUNT(*) as total FROM favoritos');
         console.log('📊 Total de favoritos en la base de datos:', countResult[0].total);
         

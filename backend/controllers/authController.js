@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 
 // Configuración JWT
 const JWT_SECRET = process.env.JWT_SECRET || 'secreto_super_seguro_2025';
-const JWT_EXPIRES_IN = '7d';
+const JWT_EXPIRES_IN = '1h';
 
 // Registro de usuario
 const register = async (req, res) => {
@@ -118,7 +118,7 @@ const login = async (req, res) => {
     if (users.length === 0) {
       return res.status(401).json({
         success: false,
-        message: 'Credenciales incorrectas'
+        message: 'No existe una cuenta con este email'
       });
     }
 
@@ -128,7 +128,7 @@ const login = async (req, res) => {
     if (user.estado !== 'active') {
       return res.status(401).json({
         success: false,
-        message: 'Cuenta desactivada'
+        message: 'Cuenta desactivada. Contacta al administrador'
       });
     }
 
@@ -138,7 +138,7 @@ const login = async (req, res) => {
     if (!isPasswordValid) {
       return res.status(401).json({
         success: false,
-        message: 'Credenciales incorrectas'
+        message: 'Contraseña incorrecta'
       });
     }
 

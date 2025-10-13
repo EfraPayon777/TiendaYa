@@ -93,7 +93,7 @@ const ReviewsScreen = ({ navigation }) => {
               });
               
               Alert.alert('Éxito', 'Reseña eliminada correctamente');
-              fetchMyReviews(); // Recargar la lista
+              fetchMyReviews(); 
             } catch (error) {
               console.error('Error deleting review:', error);
               Alert.alert('Error', 'Error de conexión con el servidor');

@@ -270,14 +270,17 @@ const ProductDetailScreen = ({ route, navigation }) => {
 
           <View style={styles.ratingContainer}>
             <View style={styles.starsContainer}>
-              {[1, 2, 3, 4, 5].map((star) => (
-                <Ionicons 
-                  key={star}
-                  name="star" 
-                  size={16} 
-                  color="#FFD700" 
-                />
-              ))}
+              {[1, 2, 3, 4, 5].map((star) => {
+                const rating = parseFloat(product.promedio_rating) || 0;
+                return (
+                  <Ionicons 
+                    key={star}
+                    name={star <= rating ? "star" : "star-outline"} 
+                    size={16} 
+                    color="#FFD700" 
+                  />
+                );
+              })}
             </View>
             <Text style={styles.ratingText}>
               {product.promedio_rating && (typeof product.promedio_rating === 'number' || typeof product.promedio_rating === 'string') && parseFloat(product.promedio_rating) > 0 

@@ -177,7 +177,7 @@ const RegisterScreen = ({ navigation }) => {
         maxWidth: isDesktop ? 600 : isTablet ? 500 : '100%',
         marginHorizontal: isWeb ? 'auto' : 0,
         paddingHorizontal: isWeb ? 20 : 0,
-        height: '100vh', // Asegurar altura completa en web
+        height: '100vh', 
       }
     ]}>
       <StatusBar barStyle="dark-content" />

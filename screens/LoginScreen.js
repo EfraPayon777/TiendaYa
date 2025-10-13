@@ -47,7 +47,22 @@ const LoginScreen = ({ navigation }) => {
       ]);
     } catch (error) {
       console.error('Login error:', error);
-      Alert.alert('Error', error.message || 'Credenciales incorrectas');
+      
+      // Manejar diferentes tipos de errores
+      let errorMessage = 'Error de conexión';
+      
+      if (error.message) {
+        // Usar el mensaje específico del servidor
+        errorMessage = error.message;
+      } else if (error.status === 401) {
+        errorMessage = 'Credenciales incorrectas';
+      } else if (error.status === 500) {
+        errorMessage = 'Error del servidor. Intenta más tarde';
+      } else if (error.status === 0) {
+        errorMessage = 'Sin conexión a internet';
+      }
+      
+      Alert.alert('Error de inicio de sesión', errorMessage);
     } finally {
       setLoading(false);
     }

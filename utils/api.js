@@ -4,19 +4,19 @@ import Constants from 'expo-constants';
 // Función para obtener automáticamente la URL del backend
 const getBackendURL = () => {
   if (__DEV__) {
-    // Detectar si estamos en dispositivo físico o emulador
+    
     const debuggerHost = Constants.expoGoConfig?.debuggerHost;
     console.log('🔍 Debug - debuggerHost detectado:', debuggerHost);
     
     if (debuggerHost) {
-      // Dispositivo físico - usar IP de la red
+      
       const ip = debuggerHost.split(':')[0];
       const url = `http://${ip}:4000`;
       console.log('🔍 Debug - Dispositivo físico detectado, IP:', ip);
       console.log('🔍 Debug - URL del backend:', url);
       return url;
     } else {
-      // Emulador - usar localhost
+      
       const url = 'http://localhost:4000';
       console.log('🔍 Debug - Emulador detectado, usando localhost');
       console.log('🔍 Debug - URL del backend:', url);
@@ -65,7 +65,7 @@ export const apiRequest = async (url, options = {}) => {
   try {
     console.log('🌐 Petición a:', url);
     
-    // Configurar headers por defecto
+    
     const defaultHeaders = {};
     
     // Solo agregar Content-Type si no es FormData
@@ -83,7 +83,9 @@ export const apiRequest = async (url, options = {}) => {
     
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      const error = new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      error.status = response.status;
+      throw error;
     }
     
     return await response.json();

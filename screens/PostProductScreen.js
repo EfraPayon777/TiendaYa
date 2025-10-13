@@ -127,7 +127,7 @@ const PostProductScreen = ({ navigation }) => {
       const result = await apiRequest(API_ENDPOINTS.PRODUCTOS, {
         method: 'POST',
         body: dataToSend,
-        // No especificar Content-Type, React Native lo maneja automáticamente con FormData
+       
       });
 
       console.log('Resultado:', result);
@@ -203,7 +203,7 @@ const PostProductScreen = ({ navigation }) => {
         maxWidth: isDesktop ? 800 : isTablet ? 600 : '100%',
         marginHorizontal: isWeb ? 'auto' : 0,
         paddingHorizontal: isWeb ? 20 : 0,
-        height: '100vh', // Asegurar altura completa en web
+        height: '100vh', 
       }
     ]}>
       <StatusBar barStyle="dark-content" />

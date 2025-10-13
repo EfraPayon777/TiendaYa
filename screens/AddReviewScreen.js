@@ -79,8 +79,8 @@ const AddReviewScreen = ({ route, navigation }) => {
       <View style={styles.header}>
         <TouchableOpacity 
           style={[styles.backButton, { opacity: 0 }]}
-          onPress={() => {}} // Desactivar acción
-          disabled={true} // Deshabilitar completamente
+          onPress={() => {}} 
+          disabled={true} 
         >
           <Ionicons name="arrow-back" size={24} color="#1A1A1A" />
         </TouchableOpacity>

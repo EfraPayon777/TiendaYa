@@ -1,0 +1,4 @@
+#Repositorio del proyecto ya preparado con Docker:
+https://github.com/EfraPayon777/TiendaYa
+#Link del url del video explicando el funcionamiento:
+https://www.youtube.com/watch?v=Tu2g89SbroI

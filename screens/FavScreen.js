@@ -122,7 +122,19 @@ const FavScreen = ({ navigation }) => {
 
         {/* Rating con estrellas */}
         <View style={styles.ratingContainer}>
-          <Ionicons name="star" size={16} color="#FFD700" />
+          <View style={styles.starsContainer}>
+            {[1, 2, 3, 4, 5].map((star) => {
+              const rating = parseFloat(item.promedio_rating) || 0;
+              return (
+                <Ionicons 
+                  key={star}
+                  name={star <= rating ? "star" : "star-outline"} 
+                  size={16} 
+                  color="#FFD700" 
+                />
+              );
+            })}
+          </View>
           <Text style={styles.ratingText}>
             {item.promedio_rating && (typeof item.promedio_rating === 'number' || typeof item.promedio_rating === 'string') && parseFloat(item.promedio_rating) > 0 ? 
               `(${parseFloat(item.promedio_rating).toFixed(1)})` : 
@@ -283,6 +295,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 8,
+  },
+  starsContainer: {
+    flexDirection: 'row',
+    marginRight: 4,
   },
   ratingText: {
     marginLeft: 6,

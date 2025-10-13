@@ -28,7 +28,7 @@ const ProfileScreen = ({ navigation }) => {
     creadoEn: '',
     foto_perfil: null,
   });
-  const [imageKey, setImageKey] = useState(0); // Para forzar refresco de imagen
+  const [imageKey, setImageKey] = useState(0); 
   const [stats, setStats] = useState({
     productos: 0,
     favoritos: 0,
@@ -281,7 +281,7 @@ const ProfileScreen = ({ navigation }) => {
         maxWidth: isDesktop ? 800 : isTablet ? 600 : '100%',
         marginHorizontal: isWeb ? 'auto' : 0,
         paddingHorizontal: isWeb ? 20 : 0,
-        height: '100vh', // Asegurar altura completa en web
+        height: '100vh', 
       }
     ]}>
       <StatusBar barStyle="dark-content" />
@@ -291,8 +291,8 @@ const ProfileScreen = ({ navigation }) => {
         style={{ flex: 1 }}
         contentContainerStyle={{ 
           flexGrow: 1,
-          paddingTop: 20, // Espacio superior
-          paddingBottom: 50 // Espacio extra al final
+          paddingTop: 20, 
+          paddingBottom: 50 
         }}
       >
         {/* Header del perfil */}
